@@ -1,16 +1,33 @@
-# This is a sample Python script.
+import asyncio
+import logging
+import os
+from dotenv import load_dotenv
+from aiogram import Bot, Dispatcher, types, F, Router
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from src.utils.commands import set_commands
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(name)s - %(message)s")
+load_dotenv()
+
+bot = Bot(token=os.getenv("TOKEN"))
+dp = Dispatcher()
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+8 to toggle the breakpoint.
+async def start_bot(bot: Bot):
+    """
+    Уведомление о запуске админу
+    """
+    await bot.send_message(chat_id=os.getenv("ADMIN_ID"), text="Бот запущен!")
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+async def main():
+    await set_commands(bot)
+    await start_bot(bot)
+    try:
+        await dp.start_polling(bot)
+    finally:
+        await bot.session.close()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+if __name__ == "__main__":
+    asyncio.run(main())
